@@ -1,0 +1,32 @@
+:host {
+  display: block;
+  padding: 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+header {
+  margin-bottom: 1.5rem;
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+  }
+
+  span {
+    font-size: 0.875rem;
+    color: #64748b;
+  }
+}
+
+.trip-search-container {
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+
+.trip-cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}

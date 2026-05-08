@@ -1,1 +1,15 @@
-<p>{{ tripService.trips() | json }}</p>
+<div>
+  <header>
+    <h1>Meine Reisen</h1>
+    <span>{{ filteredTrips().length }} Reisen gesamt</span>
+  </header>
+
+  <div class="trip-search-container">
+    <app-trip-search [(searchTerm)]="searchTerm" />
+  </div>
+  <div class="trip-cards-container">
+    @for (trip of filteredTrips(); track trip.id) {
+      <app-trip-card [trip]="trip" />
+    }
+  </div>
+</div>
