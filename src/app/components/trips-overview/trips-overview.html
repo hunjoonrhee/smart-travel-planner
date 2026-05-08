@@ -6,6 +6,15 @@
 
   <div class="trip-search-container">
     <app-trip-search [(searchTerm)]="searchTerm" />
+    <mat-form-field>
+      <mat-label>Trip Status</mat-label>
+      <mat-select [formControl]="statusControl">
+        <mat-option [value]="null"> Alle </mat-option>
+        @for (status of tripStatuses; track status) {
+          <mat-option [value]="status">{{ status }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
   </div>
   <div class="trip-cards-container">
     @for (trip of filteredTrips(); track trip.id) {

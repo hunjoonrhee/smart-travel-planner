@@ -21,8 +21,18 @@ header {
 }
 
 .trip-search-container {
+  display: flex;
+  gap: 1rem;
   margin-bottom: 1.5rem;
-  width: 100%;
+  align-items: center;
+
+  app-trip-search {
+    flex: 1;
+  }
+
+  mat-form-field {
+    width: 180px;
+  }
 }
 
 .trip-cards-container {

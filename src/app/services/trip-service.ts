@@ -33,6 +33,20 @@ const SEED_DATA: Trip[] = [
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },
+  {
+    id: '3',
+    title: 'Travel to Japan',
+    startDate: '2025-02-20',
+    endDate: '2025-03-15',
+    budget: 1500,
+    currency: 'EUR',
+    description: 'Go to Japan!',
+    status: 'completed',
+    travelers: [],
+    destinations: [],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
 ];
 
 @Injectable({
