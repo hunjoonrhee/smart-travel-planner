@@ -56,6 +56,8 @@ export class TripService {
   private idb!: IDBPDatabase;
   private _trips = signal<Trip[]>([]);
   readonly trips = this._trips.asReadonly();
+  private _trip = signal<Trip | undefined>(undefined);
+  readonly trip = this._trip.asReadonly();
 
   async init() {
     this.idb = await openDB(DB_NAME, 1, {
@@ -80,5 +82,13 @@ export class TripService {
   async deleteTrip(id: string) {
     await this.idb.delete(STORE, id);
     this._trips.update((trips) => trips.filter((t) => t.id !== id));
+  }
+
+  async getTripById(id: string) {
+    const trip = await this.idb.get(STORE, id);
+    if (!trip) {
+      throw new Error('Trip not found!');
+    }
+    this._trip.set(trip);
   }
 }

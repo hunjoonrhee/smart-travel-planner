@@ -1,5 +1,5 @@
 @if (id()) {
-  <p>edit-trip works!</p>
+  <p>edit-trip works! {{ this.tripService.trip()?.title }}</p>
 } @else {
   <p>new-trip works!</p>
 }

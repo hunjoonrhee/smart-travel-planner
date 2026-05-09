@@ -1,4 +1,5 @@
-import { Component, input } from '@angular/core';
+import { Component, inject, input, OnInit } from '@angular/core';
+import { TripService } from '../../services/trip-service';
 
 @Component({
   selector: 'app-new-trip',
@@ -6,6 +7,12 @@ import { Component, input } from '@angular/core';
   templateUrl: './new-trip.html',
   styleUrl: './new-trip.scss',
 })
-export class NewTrip {
+export class NewTrip implements OnInit {
   readonly id = input<string>();
+  readonly tripService = inject(TripService);
+  ngOnInit(): void {
+    if (this.id()) {
+      this.tripService.getTripById(this.id()!);
+    }
+  }
 }
