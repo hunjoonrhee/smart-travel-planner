@@ -1,18 +1,20 @@
-<mat-card class="trip-card" appearance="outlined">
-  <div class="card-header">
-    <mat-card-header>
-      <mat-card-title>{{ trip().title }}</mat-card-title>
-    </mat-card-header>
-    <mat-chip>{{ trip().status }}</mat-chip>
-  </div>
+<div (click)="goToDetail(trip().id)">
+  <mat-card class="trip-card" appearance="outlined">
+    <div class="card-header">
+      <mat-card-header>
+        <mat-card-title>{{ trip().title }}</mat-card-title>
+      </mat-card-header>
+      <mat-chip>{{ trip().status }}</mat-chip>
+    </div>
 
-  <mat-card-content>
-    <span>
-      {{ trip().startDate | date: 'dd.MM.yyyy' }} - {{ trip().endDate | date: 'dd.MM.yyyy' }}
-    </span>
-    <p>Budget: {{ trip().budget }} {{ trip().currency }}</p>
-  </mat-card-content>
-  <mat-card-footer class="trip-card-footer">
-    <p>Travelers: {{ trip().travelers.length }} Reisende</p>
-  </mat-card-footer>
-</mat-card>
+    <mat-card-content>
+      <span>
+        {{ trip().startDate | date: 'dd.MM.yyyy' }} - {{ trip().endDate | date: 'dd.MM.yyyy' }}
+      </span>
+      <p>Budget: {{ trip().budget }} {{ trip().currency }}</p>
+    </mat-card-content>
+    <mat-card-footer class="trip-card-footer">
+      <p>Travelers: {{ trip().travelers.length }} Reisende</p>
+    </mat-card-footer>
+  </mat-card>
+</div>

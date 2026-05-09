@@ -8,6 +8,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { TripStatus } from '../../types';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { Router, RouterOutlet } from '@angular/router';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-trips-overview',
@@ -19,6 +22,9 @@ import { toSignal } from '@angular/core/rxjs-interop';
     ReactiveFormsModule,
     MatInputModule,
     MatSelectModule,
+    RouterOutlet,
+    MatIconModule,
+    MatButtonModule,
   ],
   templateUrl: './trips-overview.html',
   styleUrl: './trips-overview.scss',
@@ -26,6 +32,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 export class TripsOverview {
   readonly tripService = inject(TripService);
   readonly searchTerm = signal('');
+  readonly route = inject(Router);
 
   readonly filteredTrips = computed(() => {
     const trips = this.tripService.trips();
@@ -45,4 +52,8 @@ export class TripsOverview {
   readonly selectedStatus = toSignal(this.statusControl.valueChanges, { initialValue: null });
 
   readonly tripStatuses = ['active', 'cancelled', 'completed', 'draft', 'planned'] as const;
+
+  newTrip() {
+    this.route.navigate(['/new-trip']);
+  }
 }

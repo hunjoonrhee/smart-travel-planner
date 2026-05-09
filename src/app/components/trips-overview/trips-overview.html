@@ -1,6 +1,10 @@
 <div>
   <header>
-    <h1>Meine Reisen</h1>
+    <div class="title-box">
+      <h1>Meine Reisen</h1>
+      <button matButton="filled" (click)="newTrip()"><mat-icon>add</mat-icon> New Trip</button>
+    </div>
+
     <span>{{ filteredTrips().length }} Reisen gesamt</span>
   </header>
 
@@ -22,3 +26,4 @@
     }
   </div>
 </div>
+<router-outlet />
