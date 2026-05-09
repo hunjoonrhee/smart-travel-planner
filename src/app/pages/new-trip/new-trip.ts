@@ -10,7 +10,7 @@ import { TripService } from '../../services/trip-service';
 export class NewTrip implements OnInit {
   readonly id = input<string>();
   readonly tripService = inject(TripService);
-  async ngOnInit(): void {
+  async ngOnInit() {
     if (this.id()) {
       await this.tripService.getTripById(this.id()!);
     }
