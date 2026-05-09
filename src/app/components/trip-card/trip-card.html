@@ -1,8 +1,18 @@
-<div (click)="goToDetail(trip().id)">
+<div>
   <mat-card class="trip-card" appearance="outlined">
     <div class="card-header">
       <mat-card-header>
-        <mat-card-title>{{ trip().title }}</mat-card-title>
+        <div class="title-box">
+          <mat-card-title class="trip-title" (click)="goToDetail(trip().id)">{{
+            trip().title
+          }}</mat-card-title>
+          <div class="action-buttons">
+            <button matIconButton (click)="editTrip(trip().id)"><mat-icon>edit</mat-icon></button>
+            <button matIconButton (click)="removeTrip(trip().id)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
       </mat-card-header>
       <mat-chip>{{ trip().status }}</mat-chip>
     </div>

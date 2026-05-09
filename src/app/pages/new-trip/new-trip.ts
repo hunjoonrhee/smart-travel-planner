@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, input } from '@angular/core';
 
 @Component({
   selector: 'app-new-trip',
@@ -6,4 +6,6 @@ import { Component } from '@angular/core';
   templateUrl: './new-trip.html',
   styleUrl: './new-trip.scss',
 })
-export class NewTrip {}
+export class NewTrip {
+  readonly id = input<string>();
+}

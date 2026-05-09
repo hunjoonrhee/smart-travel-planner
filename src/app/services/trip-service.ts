@@ -76,4 +76,9 @@ export class TripService {
       this._trips.set(all);
     }
   }
+
+  async deleteTrip(id: string) {
+    await this.idb.delete(STORE, id);
+    this._trips.update((trips) => trips.filter((t) => t.id !== id));
+  }
 }

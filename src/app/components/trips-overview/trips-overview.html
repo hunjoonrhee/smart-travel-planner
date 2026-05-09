@@ -22,8 +22,7 @@
   </div>
   <div class="trip-cards-container">
     @for (trip of filteredTrips(); track trip.id) {
-      <app-trip-card [trip]="trip" />
+      <app-trip-card [trip]="trip" (deleteTrip)="deleteTrip($event)" />
     }
   </div>
 </div>
-<router-outlet />

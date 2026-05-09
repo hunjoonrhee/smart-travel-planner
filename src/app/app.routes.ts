@@ -15,6 +15,10 @@ export const routes: Routes = [
     component: NewTrip,
   },
   {
+    path: 'edit/:id',
+    component: NewTrip,
+  },
+  {
     path: '**',
     redirectTo: 'overview',
   },

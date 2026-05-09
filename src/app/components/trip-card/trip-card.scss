@@ -6,11 +6,31 @@
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
   }
 
+  .action-buttons {
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+
+  &:hover .action-buttons {
+    opacity: 1;
+  }
+
   .card-header {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     padding: 1rem 1rem 0;
+    .title-box {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 1rem
+    }
+    .trip-title {
+        &:hover {
+            color: #6366f1;;
+        }
+    }
   }
 
   mat-card-header {
