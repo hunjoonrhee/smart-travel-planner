@@ -1,5 +1,71 @@
-@if (id()) {
-  <p>edit-trip works! {{ tripService.trip()?.title }}</p>
-} @else {
-  <p>new-trip works!</p>
-}
+<form [formGroup]="tripForm" (ngSubmit)="onSubmit()">
+  <div class="grundinfo-container">
+    <div class="title-n-status-box">
+      <div class="title-box">
+        <mat-form-field>
+          <mat-label>Reisename</mat-label>
+          <input matInput formControlName="title" />
+          <mat-error>Reisename ist erforderlich</mat-error>
+        </mat-form-field>
+      </div>
+
+      <mat-form-field>
+        <mat-label>Status</mat-label>
+        <mat-select formControlName="status">
+          @for (status of tripStatuses; track status) {
+            <mat-option [value]="status">{{ status }}</mat-option>
+          }
+        </mat-select>
+        <mat-error>Status ist erforderlich</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="date-row">
+      <mat-form-field>
+        <mat-label>Abreisedatum</mat-label>
+        <input matInput [matDatepicker]="startPicker" formControlName="startDate" />
+        <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
+        <mat-datepicker #startPicker></mat-datepicker>
+        <mat-error>Abreisedatum ist erforderlich</mat-error>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Rückreisedatum</mat-label>
+        <input matInput [matDatepicker]="endPicker" formControlName="endDate" />
+        <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
+        <mat-datepicker #endPicker></mat-datepicker>
+        <mat-error>Rückreisedatum ist erforderlich</mat-error>
+      </mat-form-field>
+      @if (
+        tripForm.hasError('dateRange') &&
+        (tripForm.get('startDate')!.touched || tripForm.get('endDate')!.touched)
+      ) {
+        <mat-error>Rückreisedatum muss nach dem Abreisedatum liegen</mat-error>
+      }
+    </div>
+
+    <div class="budget-row">
+      <mat-form-field>
+        <mat-label>Budget</mat-label>
+        <input matInput formControlName="budget" type="number" />
+        <mat-error>
+          @if (tripForm.get('budget')!.hasError('min')) {
+            Budget muss größer als 0 sein
+          }
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Währung</mat-label>
+        <mat-select formControlName="currency">
+          @for (currency of currencies; track currency) {
+            <mat-option [value]="currency">{{ currency }}</mat-option>
+          }
+        </mat-select>
+        <mat-error>Wähurung ist erforderlich</mat-error>
+      </mat-form-field>
+    </div>
+  </div>
+  <div class="button-box">
+    <button matButton type="button" (click)="onCancel()">Abbrechen</button>
+    <button matButton type="submit" [disabled]="tripForm.invalid">Speichern</button>
+  </div>
+</form>

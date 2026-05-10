@@ -11,6 +11,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { TRIP_STATUS } from '../../types/tripStatus';
 
 @Component({
   selector: 'app-trips-overview',
@@ -45,7 +46,7 @@ export class TripsOverview {
 
   readonly selectedStatus = toSignal(this.statusControl.valueChanges, { initialValue: null });
 
-  readonly tripStatuses = ['active', 'cancelled', 'completed', 'draft', 'planned'] as const;
+  readonly tripStatuses = Object.values(TRIP_STATUS);
 
   newTrip() {
     this.router.navigate(['/new-trip']);

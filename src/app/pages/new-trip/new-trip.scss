@@ -1,0 +1,89 @@
+:host {
+  display: block;
+  padding: 2rem;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.page-subtitle {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin-bottom: 2rem;
+}
+
+.grundinfo-container {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.06),
+    0 4px 16px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1.5rem;
+}
+
+.title-n-status-box {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+
+  .title-box {
+    flex: 2;
+
+    mat-form-field {
+      width: 100%;
+    }
+  }
+
+  mat-form-field:last-child {
+    flex: 1;
+  }
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+.date-row {
+  display: flex;
+  gap: 1rem;
+
+  mat-form-field {
+    flex: 1;
+  }
+}
+
+.budget-row {
+  display: flex;
+  gap: 1rem;
+
+  mat-form-field:first-child {
+    flex: 2;
+  }
+
+  mat-form-field:last-child {
+    flex: 1;
+  }
+}
+
+.date-error {
+  font-size: 0.75rem;
+  color: #f43f5e;
+  margin-top: -0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.button-box {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 0.5rem;
+}

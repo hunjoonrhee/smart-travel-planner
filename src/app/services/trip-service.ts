@@ -1,12 +1,15 @@
 import { Injectable, signal } from '@angular/core';
 import { openDB, IDBPDatabase } from 'idb';
 import { Trip } from '../models';
+import { BasicTripData } from '../pages/new-trip/new-trip';
+import { v4 as uuidv4 } from 'uuid';
 
+const TODAY = new Date();
 const DB_NAME = 'travel-planner';
 const STORE = 'trips';
 const SEED_DATA: Trip[] = [
   {
-    id: '1',
+    id: uuidv4(),
     title: 'Travel to Seoul',
     startDate: '2026-07-14',
     endDate: '2026-08-05',
@@ -16,11 +19,11 @@ const SEED_DATA: Trip[] = [
     status: 'planned',
     travelers: [],
     destinations: [],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    createdAt: TODAY.toISOString(),
+    updatedAt: TODAY.toISOString(),
   },
   {
-    id: '2',
+    id: uuidv4(),
     title: 'Travel to Schwarzwald',
     startDate: '2026-12-30',
     endDate: '2027-01-03',
@@ -30,11 +33,11 @@ const SEED_DATA: Trip[] = [
     status: 'planned',
     travelers: [],
     destinations: [],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    createdAt: TODAY.toISOString(),
+    updatedAt: TODAY.toISOString(),
   },
   {
-    id: '3',
+    id: uuidv4(),
     title: 'Travel to Japan',
     startDate: '2025-02-20',
     endDate: '2025-03-15',
@@ -44,11 +47,10 @@ const SEED_DATA: Trip[] = [
     status: 'completed',
     travelers: [],
     destinations: [],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    createdAt: TODAY.toISOString(),
+    updatedAt: TODAY.toISOString(),
   },
 ];
-
 @Injectable({
   providedIn: 'root',
 })
@@ -90,5 +92,19 @@ export class TripService {
       throw new Error('Trip not found!');
     }
     this._trip.set(trip);
+  }
+
+  async saveTrip(data: BasicTripData) {
+    const now = new Date().toISOString();
+    const entireTripData: Trip = {
+      id: uuidv4(),
+      ...data,
+      destinations: [],
+      travelers: [],
+      createdAt: now,
+      updatedAt: now,
+    };
+    await this.idb.add(STORE, entireTripData);
+    this._trips.update((trips) => [...trips, entireTripData]);
   }
 }
