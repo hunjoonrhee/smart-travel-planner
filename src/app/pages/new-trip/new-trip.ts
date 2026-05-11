@@ -1,21 +1,17 @@
-import { Component, inject, input, OnInit } from '@angular/core';
-import { TripService } from '../../services/trip-service';
+import { Component, effect, inject, input } from '@angular/core';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatAnchor } from '@angular/material/button';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { TRIP_STATUS, TripStatus } from '../../types/tripStatus';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Currency } from '../../types';
-import { MatAnchor } from '@angular/material/button';
-import { Trip } from '../../models';
 import { Router } from '@angular/router';
+import { BasicTripData } from '../../models/trip';
+import { TripService } from '../../services/trip-service';
+import { Currency } from '../../types';
+import { TRIP_STATUS, TripStatus } from '../../types/tripStatus';
 import { DateValidator } from './dateValidator';
 
-export type BasicTripData = Omit<
-  Trip,
-  'id' | 'description' | 'travelers' | 'destinations' | 'createdAt' | 'updatedAt'
->;
 @Component({
   selector: 'app-new-trip',
   imports: [
@@ -29,7 +25,7 @@ export type BasicTripData = Omit<
   templateUrl: './new-trip.html',
   styleUrl: './new-trip.scss',
 })
-export class NewTrip implements OnInit {
+export class NewTrip {
   readonly id = input<string>();
   readonly router = inject(Router);
   readonly tripService = inject(TripService);
@@ -62,20 +58,15 @@ export class NewTrip implements OnInit {
     },
   );
 
-  ngOnInit() {
-    const id = this.id();
+  private readonly _loadTrip = effect(() => {
+    const id = this.id(); // ← 이 signal을 추적
     if (id) {
       this.tripService
         .getTripById(id)
-        .then(() => {
-          const trip = this.tripService.trip();
-          if (trip) {
-            this.tripForm.patchValue(trip);
-          }
-        })
+        .then((trip) => this.tripForm.patchValue(trip))
         .catch(console.error);
     }
-  }
+  });
 
   async onSubmit() {
     if (this.tripForm.invalid) {

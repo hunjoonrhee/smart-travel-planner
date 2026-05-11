@@ -1,8 +1,8 @@
 import { Injectable, signal } from '@angular/core';
 import { openDB, IDBPDatabase } from 'idb';
 import { Trip } from '../models';
-import { BasicTripData } from '../pages/new-trip/new-trip';
 import { v4 as uuidv4 } from 'uuid';
+import { BasicTripData } from '../models/trip';
 
 const TODAY = new Date();
 const DB_NAME = 'travel-planner';
@@ -91,7 +91,7 @@ export class TripService {
     if (!trip) {
       throw new Error('Trip not found!');
     }
-    this._trip.set(trip);
+    return trip as Trip;
   }
 
   async saveTrip(data: BasicTripData) {

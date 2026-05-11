@@ -17,3 +17,8 @@ export interface Trip {
   createdAt: string;
   updatedAt: string;
 }
+
+export type BasicTripData = Omit<
+  Trip,
+  'id' | 'description' | 'travelers' | 'destinations' | 'createdAt' | 'updatedAt'
+>;
