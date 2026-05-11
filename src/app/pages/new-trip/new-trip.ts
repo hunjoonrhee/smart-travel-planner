@@ -1,5 +1,5 @@
 import { Component, effect, inject, input } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatAnchor } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -11,6 +11,8 @@ import { TripService } from '../../services/trip-service';
 import { Currency } from '../../types';
 import { TRIP_STATUS, TripStatus } from '../../types/tripStatus';
 import { DateValidator } from './dateValidator';
+import { MatIconModule } from '@angular/material/icon';
+import { Traveler } from '../../models';
 
 @Component({
   selector: 'app-new-trip',
@@ -21,6 +23,7 @@ import { DateValidator } from './dateValidator';
     MatDatepickerModule,
     ReactiveFormsModule,
     MatAnchor,
+    MatIconModule,
   ],
   templateUrl: './new-trip.html',
   styleUrl: './new-trip.scss',
@@ -31,6 +34,17 @@ export class NewTrip {
   readonly tripService = inject(TripService);
   readonly tripStatuses = Object.values(TRIP_STATUS);
   readonly currencies: Currency[] = ['EUR', 'GBP', 'USD', 'CHF'];
+
+  readonly traveler = new FormGroup({
+    name: new FormControl<string>('', {
+      validators: Validators.required,
+    }),
+    age: new FormControl<number>(0, {
+      validators: Validators.min(1),
+    }),
+    passportNumber: new FormControl<string>(''),
+    notes: new FormControl<string>(''),
+  });
 
   readonly tripForm = new FormGroup(
     {
@@ -52,11 +66,23 @@ export class NewTrip {
       currency: new FormControl<Currency | null>(null, {
         validators: Validators.required,
       }),
+      travelers: new FormArray<FormGroup>([
+        new FormGroup({
+          name: new FormControl<string>('', Validators.required),
+          age: new FormControl<number>(0, Validators.min(1)),
+          passportNumber: new FormControl<string>(''),
+          notes: new FormControl<string>(''),
+        }),
+      ]),
     },
     {
       validators: DateValidator(),
     },
   );
+
+  get travelersControl() {
+    return this.tripForm.get('travelers') as FormArray<FormGroup>;
+  }
 
   private readonly _loadTrip = effect(() => {
     const id = this.id(); // ← 이 signal을 추적
@@ -80,6 +106,7 @@ export class NewTrip {
       endDate: this.tripForm.value.endDate || '',
       budget: this.tripForm.value.budget || 0,
       currency: this.tripForm.value.currency || 'EUR',
+      travelers: this.tripForm.value.travelers as Traveler[],
     };
 
     await this.tripService.saveTrip(reiseData);
@@ -88,5 +115,20 @@ export class NewTrip {
 
   onCancel() {
     this.router.navigate(['/overview']);
+  }
+
+  reisendenHinzufuegen() {
+    this.travelersControl.push(
+      new FormGroup({
+        name: new FormControl<string>('', Validators.required),
+        age: new FormControl<number>(0, Validators.min(1)),
+        passportNumber: new FormControl<string>(''),
+        notes: new FormControl<string>(''),
+      }),
+    );
+  }
+
+  reisendeEntfernen(index: number) {
+    this.travelersControl.removeAt(index);
   }
 }

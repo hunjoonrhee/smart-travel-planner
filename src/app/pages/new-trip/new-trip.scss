@@ -1,8 +1,6 @@
 :host {
   display: block;
   padding: 2rem;
-  max-width: 720px;
-  margin: 0 auto;
 }
 
 h2 {
@@ -11,13 +9,18 @@ h2 {
   margin-bottom: 0.25rem;
 }
 
+h3,
+h4 {
+  color: #64748b;
+}
+
 .page-subtitle {
   font-size: 0.85rem;
   color: #64748b;
   margin-bottom: 2rem;
 }
 
-.grundinfo-container {
+.container {
   background: white;
   border-radius: 12px;
   padding: 1.5rem;
@@ -28,6 +31,17 @@ h2 {
     0 1px 3px rgba(0, 0, 0, 0.06),
     0 4px 16px rgba(0, 0, 0, 0.05);
   margin-bottom: 1.5rem;
+}
+
+.groupTitle {
+  display: flex;
+  flex-direction: row;
+  gap: 0.25rem;
+  mat-icon {
+    color: #64748b;
+  }
+
+  align-items: center;
 }
 
 .title-n-status-box {
@@ -86,4 +100,22 @@ mat-form-field {
   justify-content: flex-end;
   gap: 0.75rem;
   padding-top: 0.5rem;
+}
+
+.traveler-box {
+  background: lightgray;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.06),
+    0 4px 16px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1.5rem;
+}
+
+.add-reisende-button {
+  display: flex;
+  justify-content: flex-end;
 }

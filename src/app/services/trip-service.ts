@@ -100,7 +100,6 @@ export class TripService {
       id: uuidv4(),
       ...data,
       destinations: [],
-      travelers: [],
       createdAt: now,
       updatedAt: now,
     };

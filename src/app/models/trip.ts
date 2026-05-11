@@ -20,5 +20,5 @@ export interface Trip {
 
 export type BasicTripData = Omit<
   Trip,
-  'id' | 'description' | 'travelers' | 'destinations' | 'createdAt' | 'updatedAt'
+  'id' | 'description' | 'destinations' | 'createdAt' | 'updatedAt'
 >;

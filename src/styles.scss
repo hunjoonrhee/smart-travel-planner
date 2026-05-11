@@ -33,8 +33,9 @@ body {
   font: var(--mat-sys-body-medium);
 
   // Reset the user agent margin.
-  margin: 0;
+  margin: 0 auto;
   height: 100%;
+  max-width: 1600px;
 }
 /* You can add global styles to this file, and also import other style files */
 @font-face {
@@ -44,8 +45,4 @@ body {
 
 * {
   font-family: 'VictorMono NF', monospace;
-}
-
-body {
-  margin: 2rem;
 }
