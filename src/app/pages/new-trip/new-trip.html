@@ -3,7 +3,7 @@
   <form [formGroup]="tripForm" (ngSubmit)="onSubmit()">
     <div class="container">
       <div class="groupTitle">
-        <mat-icon>flight</mat-icon>
+        <mat-icon>local_airport</mat-icon>
         <h3>Grundinformationen</h3>
       </div>
       <div class="title-n-status-box">
@@ -116,6 +116,13 @@
           </button>
         </div>
       </div>
+    </div>
+    <div class="container">
+      <div class="groupTitle">
+        <mat-icon>place</mat-icon>
+        <h3>Reiseziele</h3>
+      </div>
+      <div formArrayName="destinations"></div>
     </div>
     <div class="button-box">
       <button matButton type="button" (click)="onCancel()">Abbrechen</button>
