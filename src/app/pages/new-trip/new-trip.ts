@@ -1,4 +1,4 @@
-import { Component, effect, inject, input } from '@angular/core';
+import { Component, computed, DestroyRef, effect, inject, input } from '@angular/core';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatAnchor } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -13,6 +13,8 @@ import { TRIP_STATUS, TripStatus } from '../../types/tripStatus';
 import { DateValidator } from './dateValidator';
 import { MatIconModule } from '@angular/material/icon';
 import { Destination, Traveler } from '../../models';
+import { ArraySection } from '../../shared/array-section/array-section';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 type TravelerForm = {
   name: FormControl<string>;
@@ -40,6 +42,7 @@ type DestinationForm = {
     ReactiveFormsModule,
     MatAnchor,
     MatIconModule,
+    ArraySection,
   ],
   templateUrl: './new-trip.html',
   styleUrl: './new-trip.scss',
@@ -47,76 +50,29 @@ type DestinationForm = {
 export class NewTrip {
   readonly id = input<string>();
   readonly router = inject(Router);
+  readonly destroyRef = inject(DestroyRef);
   readonly tripService = inject(TripService);
   readonly tripStatuses = Object.values(TRIP_STATUS);
   readonly currencies: Currency[] = ['EUR', 'GBP', 'USD', 'CHF'];
 
-  readonly traveler = new FormGroup({
-    name: new FormControl<string>('', {
-      validators: Validators.required,
-    }),
-    age: new FormControl<number>(0, {
-      validators: Validators.min(1),
-    }),
-    passportNumber: new FormControl<string>(''),
-    notes: new FormControl<string>(''),
-  });
-
   readonly tripForm = new FormGroup(
     {
-      title: new FormControl<string>('', {
-        validators: Validators.required,
-      }),
-      status: new FormControl<TripStatus | ''>('', {
-        validators: Validators.required,
-      }),
-      startDate: new FormControl<string>('', {
-        validators: Validators.required,
-      }),
-      endDate: new FormControl<string>('', {
-        validators: Validators.required,
-      }),
-      budget: new FormControl<number>(0, {
-        validators: Validators.min(1),
-      }),
-      currency: new FormControl<Currency | null>(null, {
-        validators: Validators.required,
-      }),
-      travelers: new FormArray<FormGroup<TravelerForm>>([
-        new FormGroup<TravelerForm>({
-          name: new FormControl<string>('', { nonNullable: true, validators: Validators.required }),
-          age: new FormControl<number>(0, Validators.min(1)),
-          passportNumber: new FormControl<string>(''),
-          notes: new FormControl<string>(''),
-        }),
-      ]),
-      destinations: new FormArray<FormGroup<DestinationForm>>([
-        new FormGroup<DestinationForm>({
-          city: new FormControl<string>('', { nonNullable: true, validators: Validators.required }),
-          country: new FormControl<string>('', {
-            nonNullable: true,
-            validators: Validators.required,
-          }),
-          arrivalDate: new FormControl<string>('', {
-            nonNullable: true,
-            validators: Validators.required,
-          }),
-          departureDate: new FormControl<string>('', {
-            nonNullable: true,
-            validators: Validators.required,
-          }),
-          nights: new FormControl<number>(0, {
-            nonNullable: true,
-            validators: Validators.required,
-          }),
-          activities: new FormArray<FormGroup>([]),
-        }),
-      ]),
+      title: new FormControl<string>('', { validators: Validators.required }),
+      status: new FormControl<TripStatus | ''>('', { validators: Validators.required }),
+      startDate: new FormControl<string>('', { validators: Validators.required }),
+      endDate: new FormControl<string>('', { validators: Validators.required }),
+      budget: new FormControl<number>(0, { validators: Validators.min(1) }),
+      currency: new FormControl<Currency | null>(null, { validators: Validators.required }),
+      travelers: new FormArray<FormGroup<TravelerForm>>([]),
+      destinations: new FormArray<FormGroup<DestinationForm>>([]),
     },
-    {
-      validators: DateValidator(),
-    },
+    { validators: DateValidator('startDate', 'endDate') },
   );
+
+  constructor() {
+    this.createTravelerGroup();
+    this.createDestinationGroup();
+  }
 
   get travelersControl() {
     return this.tripForm.get('travelers') as FormArray<FormGroup<TravelerForm>>;
@@ -132,9 +88,9 @@ export class NewTrip {
       this.tripService.getTripById(id).then((trip) => {
         // 기존 FormArray 비우고 travelers 수만큼 FormGroup 추가
         this.travelersControl.clear();
-        trip.travelers.forEach(() => {
-          this.createTravelerGroup();
-        });
+        this.destinationsControl.clear();
+        trip.travelers.forEach(() => this.createTravelerGroup());
+        trip.destinations.forEach(() => this.createDestinationGroup());
         this.tripForm.patchValue(trip);
       });
     }
@@ -179,6 +135,9 @@ export class NewTrip {
   reisendeEntfernen(index: number) {
     this.travelersControl.removeAt(index);
   }
+  reisezieleEntfernen(index: number) {
+    this.destinationsControl.removeAt(index);
+  }
 
   private createTravelerGroup() {
     this.travelersControl.push(
@@ -192,8 +151,8 @@ export class NewTrip {
   }
 
   private createDestinationGroup() {
-    this.destinationsControl.push(
-      new FormGroup<DestinationForm>({
+    const newGroup = new FormGroup<DestinationForm>(
+      {
         city: new FormControl<string>('', { nonNullable: true, validators: Validators.required }),
         country: new FormControl<string>('', {
           nonNullable: true,
@@ -212,7 +171,20 @@ export class NewTrip {
           validators: Validators.required,
         }),
         activities: new FormArray<FormGroup>([]),
-      }),
+      },
+      { validators: DateValidator('arrivalDate', 'departureDate') },
     );
+
+    newGroup.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+      const arrival = newGroup.get('arrivalDate')?.value;
+      const departure = newGroup.get('departureDate')?.value;
+
+      if (arrival && departure) {
+        const diff = new Date(departure).getTime() - new Date(arrival).getTime();
+        const nights = Math.ceil(diff / (1000 * 60 * 60 * 24));
+        newGroup.get('nights')?.setValue(nights, { emitEvent: false });
+      }
+    });
+    this.destinationsControl.push(newGroup);
   }
 }

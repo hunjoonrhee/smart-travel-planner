@@ -101,7 +101,10 @@ export class TripService {
         ...t,
         id: uuidv4(), // 서비스에서 주입
       })),
-      destinations: [],
+      destinations: data.destinations.map((d) => ({
+        ...d,
+        id: uuidv4(), // 서비스에서 주입
+      })),
       createdAt: now,
       updatedAt: now,
     };
@@ -120,7 +123,10 @@ export class TripService {
         ...t,
         id: uuidv4(), // 서비스에서 주입
       })),
-      destinations: [],
+      destinations: data.destinations.map((d) => ({
+        ...d,
+        id: uuidv4(), // 서비스에서 주입
+      })),
       createdAt: oldTrip.createdAt,
       updatedAt: now,
     };

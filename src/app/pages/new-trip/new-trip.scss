@@ -20,20 +20,7 @@ h4 {
   margin-bottom: 2rem;
 }
 
-.container {
-  background: white;
-  border-radius: 12px;
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.06),
-    0 4px 16px rgba(0, 0, 0, 0.05);
-  margin-bottom: 1.5rem;
-}
-
-.groupTitle {
+.option-title-box {
   display: flex;
   flex-direction: row;
   gap: 0.25rem;
@@ -115,7 +102,7 @@ mat-form-field {
   margin-bottom: 1.5rem;
 }
 
-.add-options-button {
-  display: flex;
-  justify-content: flex-end;
-}
+// .add-options-button {
+//   display: flex;
+//   justify-content: flex-end;
+// }

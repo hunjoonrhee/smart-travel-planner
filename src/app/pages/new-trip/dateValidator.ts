@@ -1,17 +1,17 @@
 import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 
-export function DateValidator(): ValidatorFn {
+export function DateValidator(startField: string, endField: string): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
-    const startDate = control.get('startDate');
-    const endDate = control.get('endDate');
+    const start = control.get(startField);
+    const end = control.get(endField);
 
-    if (!startDate?.value || !endDate?.value) return null;
+    if (!start?.value || !end?.value) return null;
 
-    const start = new Date(startDate.value);
-    const end = new Date(endDate.value);
+    const startDate = new Date(start.value);
+    const endDate = new Date(end.value);
 
-    if (isNaN(start.getTime()) || isNaN(end.getTime())) return null;
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) return null;
 
-    return end <= start ? { dateRange: true } : null;
+    return endDate <= startDate ? { dateRange: true } : null;
   };
 }

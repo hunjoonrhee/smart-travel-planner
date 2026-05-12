@@ -1,11 +1,7 @@
 <div>
   <header><h1>Neue Reise erstellen</h1></header>
   <form [formGroup]="tripForm" (ngSubmit)="onSubmit()">
-    <div class="container">
-      <div class="groupTitle">
-        <mat-icon>local_airport</mat-icon>
-        <h3>Grundinformationen</h3>
-      </div>
+    <app-array-section titleIcon="local_airport" title="Grundinformationen">
       <div class="title-n-status-box">
         <div class="title-box">
           <mat-form-field>
@@ -69,16 +65,18 @@
           <mat-error>Wähurung ist erforderlich</mat-error>
         </mat-form-field>
       </div>
-    </div>
-    <div class="container">
-      <div class="groupTitle">
-        <mat-icon>people</mat-icon>
-        <h3>Reisende</h3>
-      </div>
+    </app-array-section>
+    <app-array-section
+      titleIcon="people"
+      title="Reisende"
+      addLabel="Reisenden hinzufügen"
+      addBtnIcon="add"
+      (onAdd)="reisendenHinzufuegen()"
+    >
       <div formArrayName="travelers">
         @for (traveler of travelersControl.controls; track $index) {
           <div [formGroup]="traveler" class="option-box">
-            <div class="groupTitle">
+            <div class="option-title-box">
               <mat-icon>person</mat-icon>
               <h4>Reisende</h4>
               @if ($index !== 0) {
@@ -110,29 +108,27 @@
             </mat-form-field>
           </div>
         }
-        <div class="add-options-button">
-          <button matButton (click)="reisendenHinzufuegen()" type="button">
-            <mat-icon>add</mat-icon> Reisenden hinzufügen
-          </button>
-        </div>
       </div>
-    </div>
-    <div class="container">
-      <div class="groupTitle">
-        <mat-icon>place</mat-icon>
-        <h3>Reiseziele</h3>
-      </div>
+    </app-array-section>
+
+    <app-array-section
+      titleIcon="place"
+      title="Reiseziele"
+      addLabel="Reiseziele hinzufügen"
+      addBtnIcon="add"
+      (onAdd)="reisezielHinzufuegen()"
+    >
       <div formArrayName="destinations">
         @for (destination of destinationsControl.controls; track $index) {
           <div [formGroup]="destination" class="option-box">
-            <div class="groupTitle">
+            <div class="option-title-box">
               <mat-icon>place</mat-icon>
               <h4>Reiseziel</h4>
               @if ($index !== 0) {
                 <button
                   matButton
                   class="delete-option-btn"
-                  (click)="reisendeEntfernen($index)"
+                  (click)="reisezieleEntfernen($index)"
                   type="button"
                 >
                   <mat-icon>delete</mat-icon>
@@ -168,22 +164,22 @@
                 <mat-datepicker #departurePicker></mat-datepicker>
                 <mat-error>Abreisedatum ist erforderlich</mat-error>
               </mat-form-field>
+              <mat-form-field>
+                <mat-label>Nights</mat-label>
+                <input matInput formControlName="nights" type="number" value="nights" />
+              </mat-form-field>
               @if (
-                tripForm.hasError('dateRange') &&
-                (tripForm.get('arrivalDate')!.touched || tripForm.get('departurDate')!.touched)
+                destinationsControl.hasError('dateRange') &&
+                (destinationsControl.get('arrivalDate')!.touched ||
+                  destinationsControl.get('departureDate')!.touched)
               ) {
                 <mat-error>Abreisedatum muss nach dem Ankuftsdatum liegen</mat-error>
               }
             </div>
           </div>
         }
-        <div class="add-options-button">
-          <button matButton (click)="reisezielHinzufuegen()" type="button">
-            <mat-icon>add</mat-icon> Reiseziel hinzufügen
-          </button>
-        </div>
       </div>
-    </div>
+    </app-array-section>
     <div class="button-box">
       <button matButton type="button" (click)="onCancel()">Abbrechen</button>
       <button matButton type="submit" [disabled]="tripForm.invalid">
