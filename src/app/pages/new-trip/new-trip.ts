@@ -12,7 +12,23 @@ import { Currency } from '../../types';
 import { TRIP_STATUS, TripStatus } from '../../types/tripStatus';
 import { DateValidator } from './dateValidator';
 import { MatIconModule } from '@angular/material/icon';
-import { Traveler } from '../../models';
+import { Destination, Traveler } from '../../models';
+
+type TravelerForm = {
+  name: FormControl<string>;
+  age: FormControl<number | null>;
+  passportNumber: FormControl<string | null>;
+  notes: FormControl<string | null>;
+};
+
+type DestinationForm = {
+  city: FormControl<string>;
+  country: FormControl<string>;
+  arrivalDate: FormControl<string>;
+  departureDate: FormControl<string>;
+  nights: FormControl<number>;
+  activities: FormArray;
+};
 
 @Component({
   selector: 'app-new-trip',
@@ -66,12 +82,34 @@ export class NewTrip {
       currency: new FormControl<Currency | null>(null, {
         validators: Validators.required,
       }),
-      travelers: new FormArray<FormGroup>([
-        new FormGroup({
-          name: new FormControl<string>('', Validators.required),
+      travelers: new FormArray<FormGroup<TravelerForm>>([
+        new FormGroup<TravelerForm>({
+          name: new FormControl<string>('', { nonNullable: true, validators: Validators.required }),
           age: new FormControl<number>(0, Validators.min(1)),
           passportNumber: new FormControl<string>(''),
           notes: new FormControl<string>(''),
+        }),
+      ]),
+      destinations: new FormArray<FormGroup<DestinationForm>>([
+        new FormGroup<DestinationForm>({
+          city: new FormControl<string>('', { nonNullable: true, validators: Validators.required }),
+          country: new FormControl<string>('', {
+            nonNullable: true,
+            validators: Validators.required,
+          }),
+          arrivalDate: new FormControl<string>('', {
+            nonNullable: true,
+            validators: Validators.required,
+          }),
+          departureDate: new FormControl<string>('', {
+            nonNullable: true,
+            validators: Validators.required,
+          }),
+          nights: new FormControl<number>(0, {
+            nonNullable: true,
+            validators: Validators.required,
+          }),
+          activities: new FormArray<FormGroup>([]),
         }),
       ]),
     },
@@ -81,7 +119,11 @@ export class NewTrip {
   );
 
   get travelersControl() {
-    return this.tripForm.get('travelers') as FormArray<FormGroup>;
+    return this.tripForm.get('travelers') as FormArray<FormGroup<TravelerForm>>;
+  }
+
+  get destinationsControl() {
+    return this.tripForm.get('destinations') as FormArray<FormGroup<DestinationForm>>;
   }
 
   private readonly _loadTrip = effect(() => {
@@ -111,6 +153,7 @@ export class NewTrip {
       budget: this.tripForm.value.budget || 0,
       currency: this.tripForm.value.currency || 'EUR',
       travelers: this.tripForm.value.travelers as Traveler[],
+      destinations: this.tripForm.value.destinations as Destination[],
     };
     if (this.id()) {
       await this.tripService.editTrip(this.id()!, reiseData);
@@ -129,17 +172,46 @@ export class NewTrip {
     this.createTravelerGroup();
   }
 
+  reisezielHinzufuegen() {
+    this.createDestinationGroup();
+  }
+
   reisendeEntfernen(index: number) {
     this.travelersControl.removeAt(index);
   }
 
   private createTravelerGroup() {
     this.travelersControl.push(
-      new FormGroup({
-        name: new FormControl<string>('', Validators.required),
+      new FormGroup<TravelerForm>({
+        name: new FormControl<string>('', { nonNullable: true, validators: Validators.required }),
         age: new FormControl<number>(0, Validators.min(1)),
         passportNumber: new FormControl<string>(''),
         notes: new FormControl<string>(''),
+      }),
+    );
+  }
+
+  private createDestinationGroup() {
+    this.destinationsControl.push(
+      new FormGroup<DestinationForm>({
+        city: new FormControl<string>('', { nonNullable: true, validators: Validators.required }),
+        country: new FormControl<string>('', {
+          nonNullable: true,
+          validators: Validators.required,
+        }),
+        arrivalDate: new FormControl<string>('', {
+          nonNullable: true,
+          validators: Validators.required,
+        }),
+        departureDate: new FormControl<string>('', {
+          nonNullable: true,
+          validators: Validators.required,
+        }),
+        nights: new FormControl<number>(0, {
+          nonNullable: true,
+          validators: Validators.required,
+        }),
+        activities: new FormArray<FormGroup>([]),
       }),
     );
   }
