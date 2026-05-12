@@ -97,6 +97,10 @@ export class TripService {
     const entireTripData: Trip = {
       id: uuidv4(),
       ...data,
+      travelers: data.travelers.map((t) => ({
+        ...t,
+        id: uuidv4(), // 서비스에서 주입
+      })),
       destinations: [],
       createdAt: now,
       updatedAt: now,
@@ -112,6 +116,10 @@ export class TripService {
     const updatedTrip: Trip = {
       id,
       ...data,
+      travelers: data.travelers.map((t) => ({
+        ...t,
+        id: uuidv4(), // 서비스에서 주입
+      })),
       destinations: [],
       createdAt: oldTrip.createdAt,
       updatedAt: now,
