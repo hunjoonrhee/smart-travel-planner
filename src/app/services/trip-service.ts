@@ -58,8 +58,6 @@ export class TripService {
   private idb!: IDBPDatabase;
   private _trips = signal<Trip[]>([]);
   readonly trips = this._trips.asReadonly();
-  private _trip = signal<Trip | undefined>(undefined);
-  readonly trip = this._trip.asReadonly();
 
   async init() {
     this.idb = await openDB(DB_NAME, 1, {
@@ -105,5 +103,22 @@ export class TripService {
     };
     await this.idb.add(STORE, entireTripData);
     this._trips.update((trips) => [...trips, entireTripData]);
+  }
+
+  async editTrip(id: string, data: BasicTripData) {
+    const oldTrip = await this.getTripById(id);
+    const now = new Date().toISOString();
+
+    const updatedTrip: Trip = {
+      id,
+      ...data,
+      destinations: [],
+      createdAt: oldTrip.createdAt,
+      updatedAt: now,
+    };
+    await this.idb.put(STORE, updatedTrip);
+    this._trips.update((trips) => {
+      return trips.map((trip) => (trip.id === id ? updatedTrip : trip));
+    });
   }
 }

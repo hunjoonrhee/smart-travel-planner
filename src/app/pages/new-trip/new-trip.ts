@@ -87,10 +87,14 @@ export class NewTrip {
   private readonly _loadTrip = effect(() => {
     const id = this.id(); // ← 이 signal을 추적
     if (id) {
-      this.tripService
-        .getTripById(id)
-        .then((trip) => this.tripForm.patchValue(trip))
-        .catch(console.error);
+      this.tripService.getTripById(id).then((trip) => {
+        // 기존 FormArray 비우고 travelers 수만큼 FormGroup 추가
+        this.travelersControl.clear();
+        trip.travelers.forEach(() => {
+          this.createTravelerGroup();
+        });
+        this.tripForm.patchValue(trip);
+      });
     }
   });
 
@@ -108,8 +112,12 @@ export class NewTrip {
       currency: this.tripForm.value.currency || 'EUR',
       travelers: this.tripForm.value.travelers as Traveler[],
     };
+    if (this.id()) {
+      await this.tripService.editTrip(this.id()!, reiseData);
+    } else {
+      await this.tripService.saveTrip(reiseData);
+    }
 
-    await this.tripService.saveTrip(reiseData);
     this.router.navigate(['/overview']);
   }
 
@@ -118,6 +126,14 @@ export class NewTrip {
   }
 
   reisendenHinzufuegen() {
+    this.createTravelerGroup();
+  }
+
+  reisendeEntfernen(index: number) {
+    this.travelersControl.removeAt(index);
+  }
+
+  private createTravelerGroup() {
     this.travelersControl.push(
       new FormGroup({
         name: new FormControl<string>('', Validators.required),
@@ -126,9 +142,5 @@ export class NewTrip {
         notes: new FormControl<string>(''),
       }),
     );
-  }
-
-  reisendeEntfernen(index: number) {
-    this.travelersControl.removeAt(index);
   }
 }

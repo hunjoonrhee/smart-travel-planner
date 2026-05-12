@@ -119,7 +119,9 @@
     </div>
     <div class="button-box">
       <button matButton type="button" (click)="onCancel()">Abbrechen</button>
-      <button matButton type="submit" [disabled]="tripForm.invalid">Speichern</button>
+      <button matButton type="submit" [disabled]="tripForm.invalid">
+        {{ id() ? 'Bearbeiten' : 'Speichern' }}
+      </button>
     </div>
   </form>
 </div>
