@@ -28,12 +28,10 @@
           startLabel="Abreisedatum"
           endLabel="Rückreisedatum"
         />
-        @if (
-          tripForm.get('tripDates')!.hasError('dateRange') && tripForm.get('tripDates')!.touched
-        ) {
-          <mat-error>Rückreisedatum muss nach dem Abreisedatum liegen</mat-error>
-        }
       </div>
+      @if (tripForm.get('tripDates')!.hasError('dateRange') && tripForm.get('tripDates')!.touched) {
+        <mat-error>Rückreisedatum muss nach dem Abreisedatum liegen</mat-error>
+      }
 
       <div class="budget-row">
         <mat-form-field>
@@ -147,7 +145,8 @@
             </div>
 
             @if (
-              destination.hasError('dateRange') && destination.get('destinationDates')!.touched
+              destination.get('destinationDates')!.hasError('dateRange') &&
+              destination.get('destinationDates')!.touched
             ) {
               <mat-error>Abreisedatum muss nach dem Ankunftsdatum liegen</mat-error>
             }

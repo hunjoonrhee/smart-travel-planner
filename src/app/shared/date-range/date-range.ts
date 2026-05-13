@@ -57,11 +57,13 @@ export class DateRangeComponent implements ControlValueAccessor {
   onStartChange(value: string) {
     this.startDate.set(value);
     this.onChange({ start: this.startDate(), end: this.endDate() });
+    this.onTouched();
   }
 
   onEndChange(value: string) {
     this.endDate.set(value);
     this.onChange({ start: this.startDate(), end: this.endDate() });
+    this.onTouched();
   }
 
   onBlur() {
