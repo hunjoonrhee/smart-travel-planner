@@ -1,0 +1,24 @@
+<mat-form-field>
+  <mat-label>{{ startLabel() }}</mat-label>
+  <input
+    matInput
+    [matDatepicker]="startPicker"
+    [value]="startDate()"
+    (dateChange)="onStartChange($event.value)"
+    (blur)="onBlur()"
+  />
+  <mat-datepicker-toggle matIconSuffix [for]="startPicker" />
+  <mat-datepicker #startPicker />
+</mat-form-field>
+<mat-form-field>
+  <mat-label>{{ endLabel() }}</mat-label>
+  <input
+    matInput
+    [matDatepicker]="endPicker"
+    [value]="endDate()"
+    (dateChange)="onEndChange($event.value)"
+    (blur)="onBlur()"
+  />
+  <mat-datepicker-toggle matIconSuffix [for]="endPicker" />
+  <mat-datepicker #endPicker />
+</mat-form-field>

@@ -1,0 +1,7 @@
+:host {
+  display: contents; // flex 대신 contents — 부모 flex에 투명하게 참여
+}
+
+mat-form-field {
+  flex: 2;
+}

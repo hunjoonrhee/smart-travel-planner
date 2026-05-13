@@ -1,20 +1,22 @@
-import { Component, computed, DestroyRef, effect, inject, input } from '@angular/core';
+import { Component, DestroyRef, effect, inject, input } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatAnchor } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { Router } from '@angular/router';
+import { Destination, Traveler } from '../../models';
 import { BasicTripData } from '../../models/trip';
 import { TripService } from '../../services/trip-service';
+import { ArraySection } from '../../shared/array-section/array-section';
+import { DateRangeComponent, DateRangeType } from '../../shared/date-range/date-range';
+import { DateValidator } from '../../shared/validators/dateValidator';
 import { Currency } from '../../types';
 import { TRIP_STATUS, TripStatus } from '../../types/tripStatus';
-import { DateValidator } from './dateValidator';
-import { MatIconModule } from '@angular/material/icon';
-import { Destination, Traveler } from '../../models';
-import { ArraySection } from '../../shared/array-section/array-section';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { DestinationDateRangeValidator } from '../../shared/validators/destinationDateRangeValidator';
 
 type TravelerForm = {
   name: FormControl<string>;
@@ -26,8 +28,7 @@ type TravelerForm = {
 type DestinationForm = {
   city: FormControl<string>;
   country: FormControl<string>;
-  arrivalDate: FormControl<string>;
-  departureDate: FormControl<string>;
+  destinationDates: FormControl<DateRangeType | null>;
   nights: FormControl<number>;
   activities: FormArray;
 };
@@ -43,6 +44,7 @@ type DestinationForm = {
     MatAnchor,
     MatIconModule,
     ArraySection,
+    DateRangeComponent,
   ],
   templateUrl: './new-trip.html',
   styleUrl: './new-trip.scss',
@@ -55,23 +57,30 @@ export class NewTrip {
   readonly tripStatuses = Object.values(TRIP_STATUS);
   readonly currencies: Currency[] = ['EUR', 'GBP', 'USD', 'CHF'];
 
-  readonly tripForm = new FormGroup(
-    {
-      title: new FormControl<string>('', { validators: Validators.required }),
-      status: new FormControl<TripStatus | ''>('', { validators: Validators.required }),
-      startDate: new FormControl<string>('', { validators: Validators.required }),
-      endDate: new FormControl<string>('', { validators: Validators.required }),
-      budget: new FormControl<number>(0, { validators: Validators.min(1) }),
-      currency: new FormControl<Currency | null>(null, { validators: Validators.required }),
-      travelers: new FormArray<FormGroup<TravelerForm>>([]),
-      destinations: new FormArray<FormGroup<DestinationForm>>([]),
-    },
-    { validators: DateValidator('startDate', 'endDate') },
-  );
+  readonly tripForm = new FormGroup({
+    title: new FormControl<string>('', { validators: Validators.required }),
+    status: new FormControl<TripStatus | ''>('', { validators: Validators.required }),
+    tripDates: new FormControl<DateRangeType | null>(null, {
+      validators: [Validators.required, DateValidator()],
+    }),
+    budget: new FormControl<number>(0, { validators: Validators.min(1) }),
+    currency: new FormControl<Currency | null>(null, { validators: Validators.required }),
+    travelers: new FormArray<FormGroup<TravelerForm>>([]),
+    destinations: new FormArray<FormGroup<DestinationForm>>([]),
+  });
 
   constructor() {
     this.createTravelerGroup();
     this.createDestinationGroup();
+
+    this.tripForm
+      .get('tripDates')!
+      .valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.destinationsControl.controls.forEach((ctrl) => {
+          ctrl.get('destinationDates')?.updateValueAndValidity();
+        });
+      });
   }
 
   get travelersControl() {
@@ -91,7 +100,10 @@ export class NewTrip {
         this.destinationsControl.clear();
         trip.travelers.forEach(() => this.createTravelerGroup());
         trip.destinations.forEach(() => this.createDestinationGroup());
-        this.tripForm.patchValue(trip);
+        this.tripForm.patchValue({
+          ...trip,
+          tripDates: { start: trip.startDate, end: trip.endDate },
+        });
       });
     }
   });
@@ -104,8 +116,8 @@ export class NewTrip {
     const reiseData: BasicTripData = {
       title: this.tripForm.value.title || '',
       status: this.tripForm.value.status as TripStatus,
-      startDate: this.tripForm.value.startDate || '',
-      endDate: this.tripForm.value.endDate || '',
+      startDate: this.tripForm.value.tripDates?.start || '',
+      endDate: this.tripForm.value.tripDates?.end || '',
       budget: this.tripForm.value.budget || 0,
       currency: this.tripForm.value.currency || 'EUR',
       travelers: this.tripForm.value.travelers as Traveler[],
@@ -151,36 +163,33 @@ export class NewTrip {
   }
 
   private createDestinationGroup() {
-    const newGroup = new FormGroup<DestinationForm>(
-      {
-        city: new FormControl<string>('', { nonNullable: true, validators: Validators.required }),
-        country: new FormControl<string>('', {
-          nonNullable: true,
-          validators: Validators.required,
-        }),
-        arrivalDate: new FormControl<string>('', {
-          nonNullable: true,
-          validators: Validators.required,
-        }),
-        departureDate: new FormControl<string>('', {
-          nonNullable: true,
-          validators: Validators.required,
-        }),
-        nights: new FormControl<number>(0, {
-          nonNullable: true,
-          validators: Validators.required,
-        }),
-        activities: new FormArray<FormGroup>([]),
-      },
-      { validators: DateValidator('arrivalDate', 'departureDate') },
-    );
+    const newGroup = new FormGroup<DestinationForm>({
+      city: new FormControl<string>('', { nonNullable: true, validators: Validators.required }),
+      country: new FormControl<string>('', {
+        nonNullable: true,
+        validators: Validators.required,
+      }),
+      destinationDates: new FormControl<{ start: string; end: string } | null>(null, {
+        validators: [
+          Validators.required,
+          DateValidator(),
+          DestinationDateRangeValidator(
+            () => this.tripForm.get('tripDates')?.value ?? null,
+            () => this.destinationsControl.getRawValue(),
+          ),
+        ],
+      }),
+      nights: new FormControl<number>(0, {
+        nonNullable: true,
+        validators: Validators.required,
+      }),
+      activities: new FormArray<FormGroup>([]),
+    });
 
     newGroup.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-      const arrival = newGroup.get('arrivalDate')?.value;
-      const departure = newGroup.get('departureDate')?.value;
-
-      if (arrival && departure) {
-        const diff = new Date(departure).getTime() - new Date(arrival).getTime();
+      const dates = newGroup.get('destinationDates')?.value;
+      if (dates?.start && dates?.end) {
+        const diff = new Date(dates.end).getTime() - new Date(dates.start).getTime();
         const nights = Math.ceil(diff / (1000 * 60 * 60 * 24));
         newGroup.get('nights')?.setValue(nights, { emitEvent: false });
       }

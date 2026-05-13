@@ -23,23 +23,13 @@
       </div>
 
       <div class="date-row">
-        <mat-form-field>
-          <mat-label>Abreisedatum</mat-label>
-          <input matInput [matDatepicker]="startPicker" formControlName="startDate" />
-          <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
-          <mat-datepicker #startPicker></mat-datepicker>
-          <mat-error>Abreisedatum ist erforderlich</mat-error>
-        </mat-form-field>
-        <mat-form-field>
-          <mat-label>Rückreisedatum</mat-label>
-          <input matInput [matDatepicker]="endPicker" formControlName="endDate" />
-          <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
-          <mat-datepicker #endPicker></mat-datepicker>
-          <mat-error>Rückreisedatum ist erforderlich</mat-error>
-        </mat-form-field>
+        <app-date-range
+          formControlName="tripDates"
+          startLabel="Abreisedatum"
+          endLabel="Rückreisedatum"
+        />
         @if (
-          tripForm.hasError('dateRange') &&
-          (tripForm.get('startDate')!.touched || tripForm.get('endDate')!.touched)
+          tripForm.get('tripDates')!.hasError('dateRange') && tripForm.get('tripDates')!.touched
         ) {
           <mat-error>Rückreisedatum muss nach dem Abreisedatum liegen</mat-error>
         }
@@ -143,39 +133,38 @@
               <mat-label>Land</mat-label>
               <input matInput formControlName="country" type="text" />
             </mat-form-field>
-            <div class="date-row">
-              <mat-form-field>
-                <mat-label>Ankuftsdatum</mat-label>
-                <input matInput [matDatepicker]="arrivalDatePicker" formControlName="arrivalDate" />
-                <mat-datepicker-toggle
-                  matIconSuffix
-                  [for]="arrivalDatePicker"
-                ></mat-datepicker-toggle>
-                <mat-datepicker #arrivalDatePicker></mat-datepicker>
-                <mat-error>Ankuftsdatum ist erforderlich</mat-error>
-              </mat-form-field>
-              <mat-form-field>
-                <mat-label>Abreisedatum</mat-label>
-                <input matInput [matDatepicker]="departurePicker" formControlName="departureDate" />
-                <mat-datepicker-toggle
-                  matIconSuffix
-                  [for]="departurePicker"
-                ></mat-datepicker-toggle>
-                <mat-datepicker #departurePicker></mat-datepicker>
-                <mat-error>Abreisedatum ist erforderlich</mat-error>
-              </mat-form-field>
+
+            <div class="destination-date-row">
+              <app-date-range
+                formControlName="destinationDates"
+                startLabel="Ankunftsdatum"
+                endLabel="Abreisedatum"
+              />
               <mat-form-field>
                 <mat-label>Nights</mat-label>
                 <input matInput formControlName="nights" type="number" value="nights" />
               </mat-form-field>
-              @if (
-                destinationsControl.hasError('dateRange') &&
-                (destinationsControl.get('arrivalDate')!.touched ||
-                  destinationsControl.get('departureDate')!.touched)
-              ) {
-                <mat-error>Abreisedatum muss nach dem Ankuftsdatum liegen</mat-error>
-              }
             </div>
+
+            @if (
+              destination.hasError('dateRange') && destination.get('destinationDates')!.touched
+            ) {
+              <mat-error>Abreisedatum muss nach dem Ankunftsdatum liegen</mat-error>
+            }
+            @if (
+              destination.get('destinationDates')!.hasError('destinationOutOfRange') &&
+              destination.get('destinationDates')!.touched
+            ) {
+              <mat-error>Die Reisezieldaten müssen innerhalb des Reisezeitraums liegen.</mat-error>
+            }
+            @if (
+              destination.get('destinationDates')!.hasError('destinationsOverlap') &&
+              destination.get('destinationDates')!.touched
+            ) {
+              <mat-error
+                >Dieser Reisezeitraum überschneidet sich mit einem anderen Reiseziel.</mat-error
+              >
+            }
           </div>
         }
       </div>
